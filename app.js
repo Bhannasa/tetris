@@ -1,29 +1,35 @@
-let canvas = document.querySelector('canvas');
+let canvas = document.querySelector('#main-board');
+let canvasNext=document.getElementById('next');
 let u = innerHeight / 100;
+// u/=2;
 canvas.height = 90 * u;
 canvas.width = 48 * u;
+canvasNext.height = 30 * u;
+canvasNext.width = 30 * u;
 let c = canvas.getContext('2d');
+let cn=canvasNext.getContext('2d');
 
-
-let drawBox = (j, i, color) => {
-    c.fillStyle = color;
-    c.fillRect(j * 6 * u, i * 6 * u, 6 * u, 6 * u);
-    c.strokeRect(j * 6 * u, i * 6 * u, 6 * u, 6 * u);
+let drawBox = (j, i, color,cnv) => {
+    cnv.fillStyle = color;
+    cnv.fillRect(j * 6 * u, i * 6 * u, 6 * u, 6 * u);
+    cnv.strokeStyle=color===boardColor?"white":color; // style 1
+    cnv.strokeStyle="white";                          // style 2
+    cnv.strokeRect(j * 6 * u, i * 6 * u, 6 * u, 6 * u);
 }
 
-let drawBoard = () => {
-    c.fillRect(0, 0, 48 * u, 90 * u);
+let drawBoard = (cnv) => {
+    cnv.fillRect(0, 0, 48 * u, 90 * u);
     for (let i = 0; i < 15; i++) {
         for (let j = 0; j < 8; j++) {
-            let blcColor = board[i][j] !== "" ? board[i][j] : "grey";
-            drawBox(j, i, blcColor);
+            let blcColor = board[i][j] !== "" ? board[i][j] : boardColor;
+            drawBox(j, i, blcColor,cnv);
         }
     }
 }
 
-let drawShape = (shape, x, y, rot) => {
+let drawShape = (shape, x, y, rot,cnv) => {
     let arr = shape.pattern[rot](x, y);
-    arr.forEach(e => drawBox(e.x, e.y, shape.color));
+    arr.forEach(e => drawBox(e.x, e.y, shape.color,cnv));
 }
 
 let randomInt = (a, b) => {
@@ -46,16 +52,11 @@ let makeNext = () => {
         if (posnArr[i].x < 0) next.x++;
         else if (posnArr[i].x >= 8) next.x--;
         posnArr = next.shape.pattern[next.rot](next.x, next.y);
-
     }
 }
 
 
 let update = () => {
-    if (current === null) {
-        current = next;
-        makeNext();
-    }
     let posnArr = current.shape.pattern[current.rot](current.x, current.y);
     let canMove = true;
     posnArr.forEach(bx => {
@@ -76,6 +77,8 @@ let update = () => {
         });
         clearBoard();
         current = null;
+        current=next;
+        makeNext();
     }
 }
 let move = dxn => {
@@ -85,22 +88,30 @@ let move = dxn => {
         let xx = bx.x + dxn;
         let yy = bx.y;
         if (xx < 0 || xx >= 8) canMove = false;
-        else if (board[yy][xx] !== "") canMove = false;
+        else if (yy>=0&&board[yy][xx] !== "") canMove = false;
     });
     if (canMove) current.x += dxn;
 }
 
-let rotate = () => {
+let rotate = (add=0) => {
     let posnArr = current.shape.pattern[(current.rot + 1) % 4](current.x, current.y);
     let canMove = true;
     posnArr.forEach(bx => {
-        let xx = bx.x;
+        let xx = bx.x+add;
         let yy = bx.y;
-        if (xx < 0 || xx >= 8) canMove = false;
+        if (xx < 0 || xx >= 8){
+            canMove = false;
+        } 
         else if (yy >= 15) canMove = false;
-        else if (board[yy][xx] !== "") canMove = false;
+        else if (yy>=0&&board[yy][xx] !== "") canMove = false;
     });
-    if (canMove) current.rot = (current.rot + 1) % 4;
+    if (canMove){
+        current.x+=add;
+        current.rot = (current.rot + 1) % 4;
+        return true;
+    } 
+    if(add===0&&(rotate(1)||rotate(-1)||rotate(2)||rotate(-2)))   return true;
+    return false;
 }
 
 document.addEventListener('keydown', e => {
@@ -115,8 +126,12 @@ document.addEventListener('keydown', e => {
             rotate();
             break;
         case 'ArrowDown':
-            console.log("down");
+            incScore(0.1);
             update();
+            break;
+        case ' ':
+            isGameOver?init():play=!play;
+            console.log(isGameOver,play);
             break;
     }
 });
@@ -139,23 +154,38 @@ let clearBoard = () => {
             if (board[y][x] === "") break;
         if (x === 8) {
             for (x = 0; x < 8; x++) board[y][x] = "";
-            score += 10;
+            incScore(50);
         }
     }
 }
 
 let gameOver = () => {
+    isGameOver=true;
+    document.querySelector('.gameover').style.display="block"
     play = false;
-    c.font = "50px Verdana";
-    c.fillStyle = "black";
-    c.fillText("Game over", u * 6, u * 6 * 7, );
+    // c.font = "50px Verdana";
+    // c.fillStyle = "black";
+    // c.fillText("Game over", u * 6, u * 6 * 7, );
 
 }
 
 // drawBoard();
 // let ob = shapes[0].pattern(1, 1);
 // console.log(ob);
-
+let incScore=(inc)=>{
+    if(!play)   return;
+    score+=inc;
+    if(score>=hiScore){  
+        hiScore=parseInt(score)
+        localStorage.setItem("hiScore",hiScore);
+    }
+    document.getElementById('score').innerText=parseInt(score);
+    document.getElementById('high-score').innerText=parseInt(hiScore);
+    if(score>1&&(parseInt(score/200)==level)){
+        level++;
+        document.getElementById('level').innerText=level;
+    } 
+}
 
 function init() {
     board = [
@@ -175,20 +205,33 @@ function init() {
         ["", "", "", "", "", "", "", ""],
         ["", "", "", "", "", "", "", ""]
     ];
-    current = null;
     makeNext();
+    current = next;
+    makeNext();
+    level=1;
+    document.getElementById('level').innerText=level;
+    document.querySelector('.gameover').style.display="none";
+    isGameOver=false;
     play = true;
-    score = 0;
-    gamePlay();
+    incScore(-score);
+    gamePlay(c);
 }
 
 let gamePlay = () => {
-    if (!play) return;
+    if (isGameOver) return;
+    if(!play){
+        requestAnimationFrame(gamePlay);
+        return;
+    }
     c.clearRect(0, 0, 48 * u, 90 * u);
-    drawBoard();
+    cn.clearRect(0, 0, 48 * u, 90 * u);
+    drawBoard(c);
 
     if (current) {
-        drawShape(current.shape, current.x, current.y, current.rot);
+        drawShape(current.shape, current.x, current.y, current.rot,c);
+    }
+    if(next){
+        drawShape(next.shape, 2, 3, next.rot,cn);  // here replace next.rot with 0 to see the first rotation only in next
     }
     // console.log(current);
     clearBoard();
@@ -197,5 +240,4 @@ let gamePlay = () => {
     update();
 
 }
-
 init();

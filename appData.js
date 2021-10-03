@@ -3,10 +3,13 @@ let current;
 let next;
 let board;
 let play;
-let score;
+let isGameOver=false;
+let score=0;
+let hiScore=localStorage.getItem('hiScore')||0;
+let boardColor="#eee";
 let shapes = [{
         name: "L",
-        color: "purple",
+        color: "#f47a60",
         pattern: {
             0: (x, y) => {
                 return [
@@ -44,7 +47,7 @@ let shapes = [{
     },
     {
         name: "Line",
-        color: "blue",
+        color: "#9bc472",
         pattern: {
             0: (x, y) => {
                 return [
@@ -158,7 +161,7 @@ let shapes = [{
     },
     {
         name: "T",
-        color: "yellow",
+        color: "#e8d71e",
         pattern: {
             0: (x, y) => {
                 return [
@@ -196,7 +199,7 @@ let shapes = [{
     },
     {
         name: "Z",
-        color: "cyan",
+        color: "#264143",
         pattern: {
             0: (x, y) => {
                 return [
