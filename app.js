@@ -1,7 +1,7 @@
 let canvas = document.querySelector('#main-board');
 let canvasNext=document.getElementById('next');
 let u = innerHeight / 100;
-// u/=2;
+if(innerWidth<800)  u/=2.2;
 canvas.height = 90 * u;
 canvas.width = 48 * u;
 canvasNext.height = 30 * u;
@@ -161,7 +161,7 @@ let clearBoard = () => {
 
 let gameOver = () => {
     isGameOver=true;
-    document.querySelector('.gameover').style.display="block"
+    document.querySelector('.gameover').style.display="flex"
     play = false;
     // c.font = "50px Verdana";
     // c.fillStyle = "black";
@@ -229,6 +229,7 @@ let gamePlay = () => {
 
     if (current) {
         drawShape(current.shape, current.x, current.y, current.rot,c);
+        document.body.style.backgroundColor = current.shape.color;
     }
     if(next){
         drawShape(next.shape, 2, 3, next.rot,cn);  // here replace next.rot with 0 to see the first rotation only in next

@@ -2,9 +2,10 @@
 <html>
 
 <head>
-    <title>Tetris -by BHANNASA</title>
+    <title>Tetris</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <link rel="shortcut icon" href="images/T-yellow.jpg" type="image/x-icon">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap');
         * {
@@ -23,7 +24,7 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
-            justify-items: center;
+            justify-content: center;
         }
         .board{
             width: 60vw;
@@ -62,11 +63,40 @@
             position: absolute;
             font-family: Emulogic;
             top: 0;
-            font-size: 200px;
             background-color: rgba(90, 90, 90, 0.9);
             width: 100vw;
             height: 100vh;
             display:none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+        }
+        .gameover-txt{
+            font-size: 90px;
+        }
+        .gameover-info{
+            margin-top: 50px;
+            font-size: 30px;
+        }
+        @media (max-width:800px) {
+            .indicators{
+                font-size: 20px;
+                flex-direction: row;
+                order: 1;
+                height: unset;
+                width: 100%;
+            }
+            .indicators>div{
+                padding: 10px;
+            }
+            .root{
+                align-items: flex-start;
+                padding: 20px;
+            }
+            .board{
+                order: 2;
+            }
         }
     </style>
 </head>
@@ -74,7 +104,7 @@
 <body>
     <div class="root">
         <div class="board">
-            <canvas id="main-board" style="border:1px solid black;"></canvas>
+            <canvas id="main-board" style="border:2px solid white;"></canvas>
         </div>
         <div class="indicators">
             <div class="stats">
@@ -98,7 +128,12 @@
         </div>
     </div>
     <div class="gameover">
-        Game Over
+        <div class="gameover-txt">
+            Game Over
+        </div>
+        <div class="gameover-info">
+            Press space to restart
+        </div>
     </div>
 </body>
 <script src="appData.js"></script>
