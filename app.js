@@ -1,19 +1,19 @@
 let canvas = document.querySelector('#main-board');
-let canvasNext=document.getElementById('next');
+let canvasNext = document.getElementById('next');
 let u = innerHeight / 100;
-if(innerWidth<800)  u/=2.2;
+// if (innerWidth < 800) u /= 2.2;
 canvas.height = 90 * u;
 canvas.width = 48 * u;
 canvasNext.height = 30 * u;
 canvasNext.width = 30 * u;
 let c = canvas.getContext('2d');
-let cn=canvasNext.getContext('2d');
+let cn = canvasNext.getContext('2d');
 
-let drawBox = (j, i, color,cnv) => {
+let drawBox = (j, i, color, cnv) => {
     cnv.fillStyle = color;
     cnv.fillRect(j * 6 * u, i * 6 * u, 6 * u, 6 * u);
-    cnv.strokeStyle=color===boardColor?"white":color; // style 1
-    cnv.strokeStyle="white";                          // style 2
+    cnv.strokeStyle = color === boardColor ? "white" : color; // style 1
+    cnv.strokeStyle = "white";                          // style 2
     cnv.strokeRect(j * 6 * u, i * 6 * u, 6 * u, 6 * u);
 }
 
@@ -22,18 +22,26 @@ let drawBoard = (cnv) => {
     for (let i = 0; i < 15; i++) {
         for (let j = 0; j < 8; j++) {
             let blcColor = board[i][j] !== "" ? board[i][j] : boardColor;
-            drawBox(j, i, blcColor,cnv);
+            drawBox(j, i, blcColor, cnv);
         }
     }
 }
 
-let drawShape = (shape, x, y, rot,cnv) => {
+let drawShape = (shape, x, y, rot, cnv) => {
     let arr = shape.pattern[rot](x, y);
-    arr.forEach(e => drawBox(e.x, e.y, shape.color,cnv));
+    arr.forEach(e => drawBox(e.x, e.y, shape.color, cnv));
 }
 
 let randomInt = (a, b) => {
     return Math.floor(Math.random() * 0.999 * (b - a)) + a;
+}
+
+const hold = ()=>{
+    holdInterval = setInterval(update,30);
+}
+const release = ()=>{
+    if(holdTimeOut) clearTimeout(holdTimeOut);
+    if(holdInterval)    clearInterval(holdInterval);
 }
 
 let makeNext = () => {
@@ -53,6 +61,7 @@ let makeNext = () => {
         else if (posnArr[i].x >= 8) next.x--;
         posnArr = next.shape.pattern[next.rot](next.x, next.y);
     }
+    release();
 }
 
 
@@ -77,7 +86,7 @@ let update = () => {
         });
         clearBoard();
         current = null;
-        current=next;
+        current = next;
         makeNext();
     }
 }
@@ -88,33 +97,34 @@ let move = dxn => {
         let xx = bx.x + dxn;
         let yy = bx.y;
         if (xx < 0 || xx >= 8) canMove = false;
-        else if (yy>=0&&board[yy][xx] !== "") canMove = false;
+        else if (yy >= 0 && board[yy][xx] !== "") canMove = false;
     });
     if (canMove) current.x += dxn;
 }
 
-let rotate = (add=0) => {
+let rotate = (add = 0) => {
     let posnArr = current.shape.pattern[(current.rot + 1) % 4](current.x, current.y);
     let canMove = true;
     posnArr.forEach(bx => {
-        let xx = bx.x+add;
+        let xx = bx.x + add;
         let yy = bx.y;
-        if (xx < 0 || xx >= 8){
+        if (xx < 0 || xx >= 8) {
             canMove = false;
-        } 
+        }
         else if (yy >= 15) canMove = false;
-        else if (yy>=0&&board[yy][xx] !== "") canMove = false;
+        else if (yy >= 0 && board[yy][xx] !== "") canMove = false;
     });
-    if (canMove){
-        current.x+=add;
+    if (canMove) {
+        current.x += add;
         current.rot = (current.rot + 1) % 4;
         return true;
-    } 
-    if(add===0&&(rotate(1)||rotate(-1)||rotate(2)||rotate(-2)))   return true;
+    }
+    if (add === 0 && (rotate(1) || rotate(-1) || rotate(2) || rotate(-2))) return true;
     return false;
 }
 
 document.addEventListener('keydown', e => {
+    if (!play && e.key !== ' ') return;
     switch (e.key) {
         case 'ArrowLeft':
             move(-1);
@@ -130,8 +140,7 @@ document.addEventListener('keydown', e => {
             update();
             break;
         case ' ':
-            isGameOver?init():play=!play;
-            console.log(isGameOver,play);
+            isGameOver ? init() : play = !play;
             break;
     }
 });
@@ -144,7 +153,7 @@ let clearBoard = () => {
         if (x === 8) {
             for (x = 0; x < 8; x++) {
                 if (y == 0) board[y][x] = "";
-                else [board[y][x], board[y - 1][x]] = [board[y - 1][x], board[y][x]];
+                else[board[y][x], board[y - 1][x]] = [board[y - 1][x], board[y][x]];
             }
         }
     }
@@ -160,8 +169,8 @@ let clearBoard = () => {
 }
 
 let gameOver = () => {
-    isGameOver=true;
-    document.querySelector('.gameover').style.display="flex"
+    isGameOver = true;
+    document.querySelector('.gameover').style.display = "flex"
     play = false;
     // c.font = "50px Verdana";
     // c.fillStyle = "black";
@@ -172,19 +181,19 @@ let gameOver = () => {
 // drawBoard();
 // let ob = shapes[0].pattern(1, 1);
 // console.log(ob);
-let incScore=(inc)=>{
-    if(!play)   return;
-    score+=inc;
-    if(score>=hiScore){  
-        hiScore=parseInt(score)
-        localStorage.setItem("hiScore",hiScore);
+let incScore = (inc) => {
+    if (!play) return;
+    score += inc;
+    if (score >= hiScore) {
+        hiScore = parseInt(score)
+        localStorage.setItem("hiScore", hiScore);
     }
-    document.getElementById('score').innerText=parseInt(score);
-    document.getElementById('high-score').innerText=parseInt(hiScore);
-    if(score>1&&(parseInt(score/200)==level)){
+    document.getElementById('score').innerText = parseInt(score);
+    document.getElementById('high-score').innerText = parseInt(hiScore);
+    if (score > 1 && (parseInt(score / 200) == level)) {
         level++;
-        document.getElementById('level').innerText=level;
-    } 
+        document.getElementById('level').innerText = level;
+    }
 }
 
 function init() {
@@ -208,10 +217,10 @@ function init() {
     makeNext();
     current = next;
     makeNext();
-    level=1;
-    document.getElementById('level').innerText=level;
-    document.querySelector('.gameover').style.display="none";
-    isGameOver=false;
+    level = 1;
+    document.getElementById('level').innerText = level;
+    document.querySelector('.gameover').style.display = "none";
+    isGameOver = false;
     play = true;
     incScore(-score);
     gamePlay(c);
@@ -219,7 +228,7 @@ function init() {
 
 let gamePlay = () => {
     if (isGameOver) return;
-    if(!play){
+    if (!play) {
         requestAnimationFrame(gamePlay);
         return;
     }
@@ -228,11 +237,11 @@ let gamePlay = () => {
     drawBoard(c);
 
     if (current) {
-        drawShape(current.shape, current.x, current.y, current.rot,c);
+        drawShape(current.shape, current.x, current.y, current.rot, c);
         document.body.style.backgroundColor = current.shape.color;
     }
-    if(next){
-        drawShape(next.shape, 2, 3, next.rot,cn);  // here replace next.rot with 0 to see the first rotation only in next
+    if (next) {
+        drawShape(next.shape, 2, 3, next.rot, cn);  // here replace next.rot with 0 to see the first rotation only in next
     }
     // console.log(current);
     clearBoard();
@@ -242,3 +251,53 @@ let gamePlay = () => {
 
 }
 init();
+
+// Swipe listeners for mobile devices
+
+const handleTouch = () => {
+    const diff = {
+        x: touch.end.x - touch.start.x,
+        y: touch.end.y - touch.start.y,
+        t: touch.end.t - touch.start.t
+    }
+    console.log(diff)
+    if (!play) return;
+    if(Math.abs(diff.x) <= 20 && Math.abs(diff.y) <= 20){
+        if(diff.t<200)  rotate();
+        return;
+    }
+    if (Math.abs(diff.x) > Math.abs(diff.y)) {
+        if (diff.x > 0) {
+            console.log('right');
+            move(1);
+        } else {
+            console.log('left');
+            move(-1);
+        }
+    } else {
+        if (diff.y > 0) {
+            console.log('down');
+            incScore(0.1);
+            update();
+        } else {
+            console.log('up');
+            // rotate();
+        }
+    }
+}
+stop()
+document.addEventListener('touchstart', (e) => {
+    [touch.start.x, touch.start.y, touch.start.t] = [e.changedTouches[0].pageX, e.changedTouches[0].pageY, e.timeStamp];
+    if (!play) return;
+    holdTimeOut = setTimeout(hold,400);
+})
+document.addEventListener('touchend', (e) => {
+    [touch.end.x, touch.end.y, touch.end.t] = [e.changedTouches[0].pageX, e.changedTouches[0].pageY, e.timeStamp];
+    release();
+    handleTouch();
+})
+document.addEventListener('dblclick',()=>{
+    isGameOver ? init() : play = play; // TODO: enable play pause
+});
+document.addEventListener('touchmove',release);
+document.addEventListener('touchcancel',release);

@@ -3,10 +3,27 @@ let current;
 let next;
 let board;
 let play;
-let isGameOver=false;
-let score=0;
-let hiScore=localStorage.getItem('hiScore')||0;
-let boardColor="#eee";
+let isGameOver = false;
+let score = 0;
+let hiScore = localStorage.getItem('hiScore') || 0;
+let boardColor = "#eee";
+
+// For touch listeners
+let touch = {
+    start : {
+        x : 0,
+        y : 0,
+        z : 0
+    },
+    end : {
+        x : 0,
+        y : 0,
+        z : 0
+    },
+}
+let holdTimeOut;
+let holdInterval;
+
 let shapes = [{
         name: "L",
         color: "#f47a60",
