@@ -1,7 +1,7 @@
 let canvas = document.querySelector('#main-board');
 let canvasNext = document.getElementById('next');
 let u = innerHeight / 100;
-// if (innerWidth < 800) u /= 2.2;
+if (innerWidth < 800) u /= 1.3;
 canvas.height = 90 * u;
 canvas.width = 48 * u;
 canvasNext.height = 30 * u;
@@ -9,8 +9,9 @@ canvasNext.width = 30 * u;
 let c = canvas.getContext('2d');
 let cn = canvasNext.getContext('2d');
 
-let drawBox = (j, i, color, cnv) => {
+let drawBox = (j, i, color, cnv, size=1) => {
     cnv.fillStyle = color;
+    let u= u*size;
     cnv.fillRect(j * 6 * u, i * 6 * u, 6 * u, 6 * u);
     cnv.strokeStyle = color === boardColor ? "white" : color; // style 1
     cnv.strokeStyle = "white";                          // style 2
@@ -27,9 +28,9 @@ let drawBoard = (cnv) => {
     }
 }
 
-let drawShape = (shape, x, y, rot, cnv) => {
+let drawShape = (shape, x, y, rot, cnv, size=1) => {
     let arr = shape.pattern[rot](x, y);
-    arr.forEach(e => drawBox(e.x, e.y, shape.color, cnv));
+    arr.forEach(e => drawBox(e.x, e.y, shape.color, cnv, size));
 }
 
 let randomInt = (a, b) => {
@@ -241,7 +242,7 @@ let gamePlay = () => {
         document.body.style.backgroundColor = current.shape.color;
     }
     if (next) {
-        drawShape(next.shape, 2, 3, next.rot, cn);  // here replace next.rot with 0 to see the first rotation only in next
+        drawShape(next.shape, 2, 3, next.rot, cn, 0.5);  // here replace next.rot with 0 to see the first rotation only in next
     }
     // console.log(current);
     clearBoard();
@@ -285,7 +286,7 @@ const handleTouch = () => {
         }
     }
 }
-stop()
+
 document.addEventListener('touchstart', (e) => {
     [touch.start.x, touch.start.y, touch.start.t] = [e.changedTouches[0].pageX, e.changedTouches[0].pageY, e.timeStamp];
     if (!play) return;
