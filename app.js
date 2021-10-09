@@ -1,21 +1,29 @@
+'strict'
 let canvas = document.querySelector('#main-board');
 let canvasNext = document.getElementById('next');
 let u = innerHeight / 100;
-if (innerWidth < 800) u /= 1.3;
-canvas.height = 90 * u;
-canvas.width = 48 * u;
 canvasNext.height = 30 * u;
 canvasNext.width = 30 * u;
+let size = 1;
+if (innerWidth < 800){
+    u /= 1.5; 
+    size = 0.5;
+    canvasNext.height = 15 * u;
+    canvasNext.width = 15 * u;
+}
+canvas.height = 90 * u;
+canvas.width = 48 * u;
 let c = canvas.getContext('2d');
 let cn = canvasNext.getContext('2d');
 
 let drawBox = (j, i, color, cnv, size=1) => {
     cnv.fillStyle = color;
-    let u= u*size;
+    u*=size;
     cnv.fillRect(j * 6 * u, i * 6 * u, 6 * u, 6 * u);
     cnv.strokeStyle = color === boardColor ? "white" : color; // style 1
     cnv.strokeStyle = "white";                          // style 2
     cnv.strokeRect(j * 6 * u, i * 6 * u, 6 * u, 6 * u);
+    u/=size;
 }
 
 let drawBoard = (cnv) => {
@@ -38,7 +46,7 @@ let randomInt = (a, b) => {
 }
 
 const hold = ()=>{
-    holdInterval = setInterval(update,30);
+    holdInterval = setInterval(()=>{incScore(0.1);update()},30);
 }
 const release = ()=>{
     if(holdTimeOut) clearTimeout(holdTimeOut);
@@ -242,12 +250,12 @@ let gamePlay = () => {
         document.body.style.backgroundColor = current.shape.color;
     }
     if (next) {
-        drawShape(next.shape, 2, 3, next.rot, cn, 0.5);  // here replace next.rot with 0 to see the first rotation only in next
+        drawShape(next.shape, 2, 3, next.rot, cn, size);  // here replace next.rot with 0 to see the first rotation only in next
     }
     // console.log(current);
     clearBoard();
     // supports level upto 6 till now
-    if (requestAnimationFrame(gamePlay) % (60 / level) !== 0) return;
+    if (requestAnimationFrame(gamePlay) % parseInt(60 / level) !== 0) return;
     update();
 
 }
@@ -289,6 +297,10 @@ const handleTouch = () => {
 
 document.addEventListener('touchstart', (e) => {
     [touch.start.x, touch.start.y, touch.start.t] = [e.changedTouches[0].pageX, e.changedTouches[0].pageY, e.timeStamp];
+    if(isGameOver){
+        init();
+        return;
+    }
     if (!play) return;
     holdTimeOut = setTimeout(hold,400);
 })

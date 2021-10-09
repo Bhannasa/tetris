@@ -22,7 +22,7 @@
             height: 100vh;
         }
         .root {
-            height: 100vh;
+            height: 95vh;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -48,6 +48,8 @@
             padding: 30px;
         }
         .stats{
+            display: flex;
+            flex-direction: column;
             justify-content: center;
         }
         .stats-container>div{
@@ -83,11 +85,14 @@
         }
         @media (max-width:800px) {
             .indicators{
-                font-size: 20px;
+                font-size: 12px;
                 flex-direction: row;
                 order: 1;
                 height: unset;
                 width: 100%;
+                align-items: unset;
+                justify-content: center;
+                align-self: unset;
                 /* display: none; */
             }
             .next-element{
@@ -142,7 +147,7 @@
             Game Over
         </div>
         <div class="gameover-info">
-            Press space to restart
+            Press space/tap to restart
         </div>
     </div>
 </body>
