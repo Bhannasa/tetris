@@ -6,7 +6,7 @@ canvasNext.height = 30 * u;
 canvasNext.width = 30 * u;
 let size = 1;
 if (innerWidth < 800){
-    if(innerHeight>880) u/=1.165;
+    if(innerHeight>880) u/=1.175;
     else u /= 1.19; 
     size = 0.5;
     canvasNext.height = 15 * u;
@@ -134,6 +134,7 @@ let rotate = (add = 0) => {
 }
 
 document.addEventListener('keydown', e => {
+// document.body.requestFullscreen();
     if (!play && e.key !== ' ') return;
     switch (e.key) {
         case 'ArrowLeft':
@@ -190,7 +191,6 @@ let gameOver = () => {
 
 // drawBoard();
 // let ob = shapes[0].pattern(1, 1);
-// console.log(ob);
 let incScore = (inc) => {
     if (!play) return;
     score += inc;
@@ -253,7 +253,6 @@ let gamePlay = () => {
     if (next) {
         drawShape(next.shape, 2, 3, next.rot, cn, size);  // here replace next.rot with 0 to see the first rotation only in next
     }
-    // console.log(current);
     clearBoard();
     // supports level upto 6 till now
     if (requestAnimationFrame(gamePlay) % parseInt(60 / level) !== 0) return;
@@ -270,7 +269,6 @@ const handleTouch = () => {
         y: touch.end.y - touch.start.y,
         t: touch.end.t - touch.start.t
     }
-    console.log(diff)
     if (!play) return;
     if(Math.abs(diff.x) <= 20 && Math.abs(diff.y) <= 20){
         if(diff.t<200)  rotate();
@@ -278,19 +276,15 @@ const handleTouch = () => {
     }
     if (Math.abs(diff.x) > Math.abs(diff.y)) {
         if (diff.x > 0) {
-            console.log('right');
             move(1);
         } else {
-            console.log('left');
             move(-1);
         }
     } else {
         if (diff.y > 0) {
-            console.log('down');
             incScore(0.1);
             update();
         } else {
-            console.log('up');
             // rotate();
         }
     }
