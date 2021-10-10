@@ -6,7 +6,7 @@ canvasNext.height = 30 * u;
 canvasNext.width = 30 * u;
 let size = 1;
 if (innerWidth < 800){
-    if(innerHeight>880) u/=1.16;
+    if(innerHeight>880) u/=1.165;
     else u /= 1.19; 
     size = 0.5;
     canvasNext.height = 15 * u;
